@@ -38,7 +38,7 @@ To manage the P2P TI sharing withing an organization, we developed a tool called
 
 ```bash
 > make orgsig 
-go build cmd/orgsig.go
+go build -buildvcs=false cmd/orgsig.go
 >  ./orgsig --help
 Running v0.0.1 orgsig
 
@@ -88,4 +88,3 @@ To interact with the peers, you must act as Fides Trust Model and send the peers
 
 # Related projects
 This project is now a submodule of [StratosphereLinuxIPS](https://github.com/stratosphereips/StratosphereLinuxIPS/)
-

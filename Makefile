@@ -7,7 +7,7 @@ run:
 	GOLOG_LOG_LEVEL="iris=debug" go run cmd/peercli.go --conf config.yaml
 
 orgsig:
-	go build cmd/orgsig.go
+	go build -buildvcs=false cmd/orgsig.go
 
 run-orgsig: orgsig
 	go run cmd/orgsig.go
@@ -20,7 +20,7 @@ run1:
 	GOLOG_LOG_LEVEL="iris=debug" go run cmd/peercli.go --conf config1.yaml
 
 build:
-	go build cmd/peercli.go
+	go build -buildvcs=false cmd/peercli.go
 
 protobuf:
 	protoc -I=$(PROTOBUF_DIR) --go_out=. $(PROTOBUF_DIR)/*.proto

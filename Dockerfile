@@ -11,7 +11,7 @@ RUN go mod download
 COPY cmd ./cmd
 COPY pkg ./pkg
 
-RUN go build cmd/peercli.go
+RUN go build -buildvcs=false cmd/peercli.go
 
 
 FROM debian:bullseye-slim as final
