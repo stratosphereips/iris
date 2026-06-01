@@ -4,7 +4,7 @@ import (
 	"os"
 
 	"github.com/google/uuid"
-	libp2pcrypto "github.com/libp2p/go-libp2p-core/crypto"
+	libp2pcrypto "github.com/libp2p/go-libp2p/core/crypto"
 
 	"happystoic/p2pnetwork/pkg/config"
 )

@@ -2,9 +2,9 @@ package cryptotools
 
 import (
 	"github.com/golang/protobuf/proto"
-	libp2pcrypto "github.com/libp2p/go-libp2p-core/crypto"
-	"github.com/libp2p/go-libp2p-core/host"
-	"github.com/libp2p/go-libp2p-core/peer"
+	libp2pcrypto "github.com/libp2p/go-libp2p/core/crypto"
+	"github.com/libp2p/go-libp2p/core/host"
+	"github.com/libp2p/go-libp2p/core/peer"
 	"github.com/pkg/errors"
 
 	"happystoic/p2pnetwork/pkg/messaging/pb"

@@ -3,7 +3,7 @@ package utils
 import (
 	"time"
 
-	"github.com/libp2p/go-libp2p-core/peer"
+	"github.com/libp2p/go-libp2p/core/peer"
 )
 
 // SeenMessagesCache represents cache to know if we have already seen given P2P message or not.

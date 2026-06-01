@@ -5,9 +5,8 @@ import (
 	"fmt"
 	logging "github.com/ipfs/go-log/v2"
 	"github.com/libp2p/go-libp2p"
-	"github.com/libp2p/go-libp2p-core/host"
-	"github.com/libp2p/go-libp2p-core/routing"
-	libp2pquic "github.com/libp2p/go-libp2p-quic-transport"
+	"github.com/libp2p/go-libp2p/core/host"
+	"github.com/libp2p/go-libp2p/core/routing"
 	"github.com/pkg/errors"
 
 	"happystoic/p2pnetwork/pkg/config"
@@ -59,10 +58,8 @@ func NewNode(conf *config.Config, ctx context.Context) (*Node, error) {
 		// Multiple listen addresses
 		libp2p.ListenAddrStrings(
 			// a UDP endpoint for the QUIC transport
-			fmt.Sprintf("/ip4/%s/udp/%d/quic", conf.Server.Host, conf.Server.Port),
+			fmt.Sprintf("/ip4/%s/udp/%d/quic-v1", conf.Server.Host, conf.Server.Port),
 		),
-		// support QUIC
-		libp2p.Transport(libp2pquic.NewTransport),
 		libp2p.ConnectionManager(cm),
 		// Attempt to open ports using uPNP for NATed hosts.
 		libp2p.NATPortMap(),

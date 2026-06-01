@@ -1,8 +1,8 @@
 package protocols
 
 import (
-	"github.com/libp2p/go-libp2p-core/network"
-	"github.com/libp2p/go-libp2p-core/peer"
+	"github.com/libp2p/go-libp2p/core/network"
+	"github.com/libp2p/go-libp2p/core/peer"
 
 	"happystoic/p2pnetwork/pkg/messaging/pb"
 	"happystoic/p2pnetwork/pkg/messaging/utils"

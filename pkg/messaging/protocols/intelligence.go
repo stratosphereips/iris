@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/golang/protobuf/proto"
-	"github.com/libp2p/go-libp2p-core/network"
-	"github.com/libp2p/go-libp2p-core/peer"
+	"github.com/libp2p/go-libp2p/core/network"
+	"github.com/libp2p/go-libp2p/core/peer"
 	"github.com/pkg/errors"
 
 	"happystoic/p2pnetwork/pkg/config"
@@ -149,12 +149,12 @@ func (ip *IntelligenceProtocol) createP2PIntelRequest(payload interface{}) (*pb.
 // ### We have all intelligence responses (from other peers and TL) ###
 // ####################################################################
 // Two scenarios possible:
-// 		a) This peer is the original requester. In that case I need to decrypt all the single responses and forward
-// 		   it to TL through Redis
 //
-//      b) This peer is just a middleman, in that case just wrap all the aggregated responses and forward this p2P
-//         response to the peer that asked
+//			a) This peer is the original requester. In that case I need to decrypt all the single responses and forward
+//			   it to TL through Redis
 //
+//	     b) This peer is just a middleman, in that case just wrap all the aggregated responses and forward this p2P
+//	        response to the peer that asked
 func (ip *IntelligenceProtocol) onAggregatedP2PResponses(requestId string, responses []proto.Message, meta *utils.StorageMetadata) {
 	log.Debugf("all intelligence responses were aggregated, starting to collect them")
 

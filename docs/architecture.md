@@ -91,7 +91,7 @@ Organisations:
 
 PeerDiscovery:
   ListOfMultiAddresses:
-    - "/ip4/127.0.0.1/udp/9001/quic 12D3KooWNxiCsZFyUFpLFNKDLEQDUK36my
+    - "/ip4/127.0.0.1/udp/9001/quic-v1 12D3KooWNxiCsZFyUFpLFNKDLEQDUK36my
        ifqufnnveK1jycMoJ8"
   DisableBootstrappingNodes: true
   ```

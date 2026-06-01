@@ -1,6 +1,6 @@
-FROM golang:latest AS build
+FROM golang:1.26.3 AS build
 
-ENV APP_DIR /usr/iris
+ENV APP_DIR=/usr/iris
 WORKDIR ${APP_DIR}
 
 COPY go.mod ./
@@ -11,13 +11,13 @@ RUN go mod download
 COPY cmd ./cmd
 COPY pkg ./pkg
 
-RUN go build -buildvcs=false cmd/peercli.go
+RUN CGO_ENABLED=0 go build -buildvcs=false cmd/peercli.go
 
 
-FROM debian:bullseye-slim as final
+FROM debian:bullseye-slim AS final
 
 ENV GOLOG_LOG_LEVEL="error,iris=info"
-ENV APP_DIR /usr/iris
+ENV APP_DIR=/usr/iris
 WORKDIR ${APP_DIR}
 
 COPY config.yaml ./

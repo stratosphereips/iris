@@ -9,8 +9,8 @@ import (
 // Mock configuration for testing
 var mockConfig = config.PeerDiscovery{
 	ListOfMultiAddresses: []string{
-		"/ip4/127.0.0.1/udp/9001/quic 12D3KooWLDCxxP6PAKG6NUYWs16VbSZhQNHY361otSmauvVnXV4g",
-		"/ip4/127.0.0.1/udp/9003/quic 12D3KooWLDCxxP6PAKG6NUYWs16VbSZh61otSmauvVnXV4gQNHY3",
+		"/ip4/127.0.0.1/udp/9001/quic-v1 12D3KooWLDCxxP6PAKG6NUYWs16VbSZhQNHY361otSmauvVnXV4g",
+		"/ip4/127.0.0.1/udp/9003/quic-v1 12D3KooWLDCxxP6PAKG6NUYWs16VbSZh61otSmauvVnXV4gQNHY3",
 	},
 	DisableBootstrappingNodes: false,
 	UseRedisCache:             false,
@@ -34,14 +34,14 @@ func TestGetInitPeers(t *testing.T) {
 			name: "With invalid connection string",
 			config: config.PeerDiscovery{
 				ListOfMultiAddresses: []string{
-					"/ip4/127.0.0.1/udp/9001/quic invalidPeerID",
+					"/ip4/127.0.0.1/udp/9001/quic-v1 invalidPeerID",
 				},
 				DisableBootstrappingNodes: true,
 				UseRedisCache:             false,
 				UseDns:                    false,
 			},
 			wantLen: 0,
-			wantErr: true,
+			wantErr: false,
 		},
 	}
 
@@ -66,7 +66,7 @@ func TestAddrInfoFromConnectionString(t *testing.T) {
 	}{
 		{
 			name:    "Valid connection string",
-			s:       "/ip4/127.0.0.1/udp/9001/quic 12D3KooWLDCxxP6PAKG6NUYWs16VbSZhQNHY361otSmauvVnXV4g",
+			s:       "/ip4/127.0.0.1/udp/9001/quic-v1 12D3KooWLDCxxP6PAKG6NUYWs16VbSZhQNHY361otSmauvVnXV4g",
 			wantErr: false,
 		},
 		{

@@ -3,7 +3,7 @@ package protocols
 import (
 	"encoding/json"
 
-	"github.com/libp2p/go-libp2p-core/peer"
+	"github.com/libp2p/go-libp2p/core/peer"
 
 	"happystoic/p2pnetwork/pkg/messaging/utils"
 	"happystoic/p2pnetwork/pkg/reliability"

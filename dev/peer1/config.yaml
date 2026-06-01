@@ -1,5 +1,5 @@
 # This peer has connection string:
-# /ip4/192.168.0.10/udp/9001/quic 12D3KooWNxiCsZFyUFpLFNKDLEQDUK36myifqufnnveK1jycMoJ8
+# /ip4/192.168.0.10/udp/9001/quic-v1 12D3KooWNxiCsZFyUFpLFNKDLEQDUK36myifqufnnveK1jycMoJ8
 
 Identity:
   GenerateNewKey: false
@@ -17,4 +17,4 @@ Redis:
 PeerDiscovery:
   DisableBootstrappingNodes: true
   ListOfMultiAddresses:
-    - "/ip4/192.168.0.30/udp/9003/quic 12D3KooWP62GoxVhGSSAriPhtam7Ris6XULUgk9uh5uGcXbYcEaP"
+    - "/ip4/192.168.0.30/udp/9003/quic-v1 12D3KooWP62GoxVhGSSAriPhtam7Ris6XULUgk9uh5uGcXbYcEaP"

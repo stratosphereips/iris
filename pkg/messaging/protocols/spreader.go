@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/golang/protobuf/proto"
-	"github.com/libp2p/go-libp2p-core/peer"
-	"github.com/libp2p/go-libp2p-core/protocol"
+	"github.com/libp2p/go-libp2p/core/peer"
+	"github.com/libp2p/go-libp2p/core/protocol"
 
 	"happystoic/p2pnetwork/pkg/config"
 	"happystoic/p2pnetwork/pkg/files"
@@ -88,7 +88,8 @@ func (s *Spreader) spread(protocol protocol.ID,
 }
 
 // TODO: do not use "file meta" in in logging if alert proto gonna use this too
-//       it's just confusing...
+//
+//	it's just confusing...
 func (s *Spreader) startSpreading(protocol protocol.ID,
 	sev files.Severity,
 	rights []*org.Org,

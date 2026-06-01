@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"github.com/golang/protobuf/proto"
 	logging "github.com/ipfs/go-log/v2"
-	"github.com/libp2p/go-libp2p-core/network"
-	"github.com/libp2p/go-libp2p-core/peer"
+	"github.com/libp2p/go-libp2p/core/network"
+	"github.com/libp2p/go-libp2p/core/peer"
 	"github.com/pkg/errors"
 
 	"happystoic/p2pnetwork/pkg/messaging/pb"
