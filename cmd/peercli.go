@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	"math/rand"
 	"time"
 
@@ -57,9 +58,9 @@ func main() {
 	}
 
 	// print connection strings
-	log.Infof("created node with ID: %s", localNode.ID())
+	fmt.Printf("created node with ID: %s\n", localNode.ID())
 	for _, addr := range localNode.Addrs() {
-		log.Infof("connection string: '%s %s'", addr, localNode.ID())
+		fmt.Printf("connection string: '%s %s'\n", addr, localNode.ID())
 	}
 
 	localNode.Start(ctx)

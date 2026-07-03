@@ -68,10 +68,9 @@ func NewNode(conf *config.Config, ctx context.Context) (*Node, error) {
 			dht, err = ldht.New(ctx, h, conf.Server.DhtServerMode)
 			return dht, err
 		}),
-		// Let this host use relays and advertise itself on relays if
-		// it finds it is behind NAT. Use libp2p.Relay(options...) to
-		// enable active relays and more.
-		libp2p.EnableAutoRelay(),
+		// AutoRelay now requires an explicit relay peer source. Iris does
+		// not provide one yet, so enabling it here causes startup to panic
+		// before the node can accept connections.
 		// If you want to help other peers to figure out if they are behind
 		// NATs, you can launch the server-side of AutoNAT too (AutoRelay
 		// already runs the client)
