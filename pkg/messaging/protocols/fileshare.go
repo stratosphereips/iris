@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/golang/protobuf/proto"
@@ -480,7 +482,13 @@ func (fs *FileShareProtocol) fileMetaFromP2P(p2pMeta *pb.FileMetadata) (*files.F
 
 func (fs *FileShareProtocol) fileMetaFromRedis(ann *Tl2NlRedisFileShareAnnounce) (*cid.Cid, *files.FileMeta, error) {
 	expiredAt := time.Unix(ann.ExpiredAt, 0)
-	fileCid, err := files.GetFileCid(ann.Path)
+
+	safePath, err := fs.resolveDownloadPath(ann.Path)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	fileCid, err := files.GetFileCid(safePath)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -503,10 +511,33 @@ func (fs *FileShareProtocol) fileMetaFromRedis(ann *Tl2NlRedisFileShareAnnounce)
 		ExpiredAt:   expiredAt,
 		Expired:     time.Now().After(expiredAt),
 		Available:   true,
-		Path:        ann.Path,
+		Path:        safePath,
 		Rights:      rights,
 		Severity:    severity,
 		Description: ann.Description,
 	}
 	return fileCid, meta, nil
+}
+
+// resolveDownloadPath validates that the given path (received from Redis and
+// therefore untrusted) resolves to a location inside fs.downloadDir, preventing
+// path traversal attacks that would otherwise let a Redis client make Iris
+// read and share arbitrary files from the host.
+func (fs *FileShareProtocol) resolveDownloadPath(path string) (string, error) {
+	base, err := filepath.Abs(fs.downloadDir)
+	if err != nil {
+		return "", errors.WithMessage(err, "error resolving download dir")
+	}
+
+	joined := filepath.Join(base, path)
+	resolved, err := filepath.Abs(joined)
+	if err != nil {
+		return "", errors.WithMessage(err, "error resolving file path")
+	}
+
+	if resolved != base && !strings.HasPrefix(resolved, base+string(os.PathSeparator)) {
+		return "", errors.Errorf("path %q escapes the download directory", path)
+	}
+
+	return resolved, nil
 }
