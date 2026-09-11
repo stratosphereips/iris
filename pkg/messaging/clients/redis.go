@@ -88,10 +88,10 @@ func (rc *RedisClient) subscribeChannel(channel string) {
 			}
 
 			bytesData, _ := json.Marshal(baseMsg.Data)
+			wg.Add(1)
 			go func() {
-				wg.Add(1)
+				defer wg.Done()
 				callback(bytesData)
-				wg.Done()
 			}()
 		}
 		wg.Wait()
