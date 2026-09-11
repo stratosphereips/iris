@@ -53,7 +53,7 @@ func (ck *CryptoKit) AuthenticateMessage(message proto.Message, metadata *pb.Met
 
 	// verify that message author node id matches the provided node public key
 	if idFromKey != peerId {
-		return nil
+		return errors.New("claimed node id does not match the provided node public key")
 	}
 
 	valid, err := key.Verify(bin, sign)
