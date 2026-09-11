@@ -3,6 +3,7 @@ package protocols
 import (
 	"context"
 	"encoding/json"
+	"sync"
 	"time"
 
 	"github.com/golang/protobuf/proto"
@@ -46,20 +47,25 @@ type IntelligenceResponse struct {
 type IntelligenceProtocol struct {
 	*utils.ProtoUtils
 
-	ctx                  context.Context
-	respStorage          *utils.ResponseAggregator
-	settings             *config.IntelligenceSettings
-	cacheRequestToSender map[string]peer.ID
+	ctx         context.Context
+	respStorage *utils.ResponseAggregator
+	settings    *config.IntelligenceSettings
+
+	// cacheRequestToSenderKey remembers, per request ID, the libp2p-marshalled public key
+	// of the peer that originally asked for the intelligence, so that the eventual response
+	// can be encrypted so only that peer can read it (see createFakeIntelResponse).
+	cacheRequestToSenderKey map[string][]byte
+	cacheMu                 sync.Mutex
 }
 
 func NewIntelligenceProtocol(ctx context.Context,
 	pu *utils.ProtoUtils,
 	c *config.IntelligenceSettings) *IntelligenceProtocol {
 	ip := &IntelligenceProtocol{
-		ProtoUtils:           pu,
-		ctx:                  ctx,
-		settings:             c,
-		cacheRequestToSender: make(map[string]peer.ID),
+		ProtoUtils:              pu,
+		ctx:                     ctx,
+		settings:                c,
+		cacheRequestToSenderKey: make(map[string][]byte),
 	}
 	ip.respStorage = utils.NewResponseAggregator(ip.onAggregatedP2PResponses)
 	//
@@ -204,15 +210,17 @@ func (ip *IntelligenceProtocol) onAggregatedP2PResponses(requestId string, respo
 func (ip *IntelligenceProtocol) sendIntelligenceResponseToRedis(responses [][]byte) error {
 	log.Debugf("sending intelligence data back to TL through redis")
 
-	//responses might need to be decrypted
 	recomRedisResp := make(RedisNl2TlIntelligenceResponse, 0, len(responses))
 	for i := range responses {
-		//TODO decrypt the messages here first (so far it's only marshalled)
-		// ...
+		decrypted, err := ip.Decrypt(responses[i])
+		if err != nil {
+			log.Errorf("error decrypting intelligence response: %s", err)
+			continue
+		}
 
 		// decode the response
 		singleResp := &pb.SingleEntityResponse{}
-		err := proto.Unmarshal(responses[i], singleResp)
+		err = proto.Unmarshal(decrypted, singleResp)
 		if err != nil {
 			log.Errorf("error unmarshalling singleEntityResponse: %s", err)
 			continue
@@ -341,11 +349,22 @@ func (ip *IntelligenceProtocol) createFakeIntelResponse(redisResp *RedisTl2NlInt
 	}
 	protoMsg.Metadata.Signature = signature
 
-	// TODO implement encryption with original sender public key (I need to first store the key in the map when I received the request)
-	// encrypt protoMsg
-	encrypted, err := proto.Marshal(protoMsg) // change this to encryption method
+	marshalled, err := proto.Marshal(protoMsg)
 	if err != nil {
-		return nil, errors.WithMessage(err, "error encrypting the message (TODO for now it's just marshal: ")
+		return nil, errors.WithMessage(err, "error marshalling the message before encryption: ")
+	}
+
+	ip.cacheMu.Lock()
+	requesterPubKey, ok := ip.cacheRequestToSenderKey[redisResp.RequestId]
+	delete(ip.cacheRequestToSenderKey, redisResp.RequestId)
+	ip.cacheMu.Unlock()
+	if !ok {
+		return nil, errors.Errorf("no known public key for original requester of request '%s', refusing to send unencrypted intelligence response", redisResp.RequestId)
+	}
+
+	encrypted, err := ip.EncryptForPeer(requesterPubKey, marshalled)
+	if err != nil {
+		return nil, errors.WithMessage(err, "error encrypting the intelligence response: ")
 	}
 
 	resp := &pb.IntelligenceResponse{
@@ -430,6 +449,13 @@ func (ip *IntelligenceProtocol) processP2PRequest(e *pb.IntelligenceReqEnvelope,
 	if err != nil {
 		log.Errorf("error decoding peer ID: %s", err)
 	}
+
+	// remember the original requester's public key so the eventual response can be
+	// encrypted for them, even though it will travel back through relaying peers
+	ip.cacheMu.Lock()
+	ip.cacheRequestToSenderKey[e.IntelligenceRequest.Metadata.Id] = e.IntelligenceRequest.Metadata.OriginalSender.NodePubKey
+	ip.cacheMu.Unlock()
+
 	// send request to redis
 	requestToRedis := RedisNl2TlIntelRequest{
 		RequestId: e.IntelligenceRequest.Metadata.Id,
