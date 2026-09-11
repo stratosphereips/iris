@@ -2,6 +2,8 @@ package config
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -187,7 +189,7 @@ func (ps *ProtocolSettings) validate() error {
 
 func (ps *ProtocolSettings) setDefaults() {
 	if ps.FileShare.DownloadDir == "" {
-		ps.FileShare.DownloadDir = "/tmp"
+		ps.FileShare.DownloadDir = filepath.Join(os.TempDir(), "iris-downloads")
 	}
 	if ps.Recommendation.Timeout == 0 {
 		ps.Recommendation.Timeout = 10 * time.Second

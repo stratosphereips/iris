@@ -192,8 +192,11 @@ func (fs *FileShareProtocol) tryFileProvider(msg proto.Message, p peer.ID, fileC
 }
 
 func (fs *FileShareProtocol) writeFile(fileCid cid.Cid, data []byte) (string, error) {
+	if err := os.MkdirAll(fs.downloadDir, 0700); err != nil {
+		return "", errors.WithMessage(err, "error creating download directory")
+	}
 	path := fmt.Sprintf("%s/%s", fs.downloadDir, fileCid.String())
-	err := os.WriteFile(path, data, 0644)
+	err := os.WriteFile(path, data, 0600)
 	if err != nil {
 		return "", err
 	}
